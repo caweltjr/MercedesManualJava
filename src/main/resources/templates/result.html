@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mercedes Manual Result</title>
+</head>
+<body>
+<p>Query: <span th:text="${query}"></span></p>
+<p>Text: <span th:text="${text}"></span></p>
+<p>Answer: <span th:text="${answer}"></span></p>
+<img th:if="${image}" th:src="${image}" alt="Related image"/>
+<a href="/">Back</a>
+</body>
+</html>
