@@ -7,7 +7,9 @@
 <p>Query: <span th:text="${query}"></span></p>
 <p>Text: <span th:text="${text}"></span></p>
 <p>Answer: <span th:text="${answer}"></span></p>
-<img th:if="${image}" th:src="${image}" alt="Related image"/>
+<div th:if="${image != null && image != ''}">
+    <img th:src="${image}" alt="Related image"/>
+</div>
 <a href="/">Back</a>
 </body>
 </html>
