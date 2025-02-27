@@ -44,9 +44,17 @@ public class MercedesController {
         LOGGER.info("Query endpoint hit with: " + query);
         model.addAttribute("query", query);
         try {
+            // Validate query
+            if (query == null || query.trim().isEmpty()) {
+                LOGGER.warning("Empty or null query received");
+                model.addAttribute("text", "No query provided");
+                model.addAttribute("answer", "Please enter a valid question about your Mercedes-Benz.");
+                return "result";
+            }
+
             // Embed query with OpenAI
             EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                    .input(Collections.singletonList(query))
+                    .input(Collections.singletonList(query.trim()))
                     .model("text-embedding-ada-002")
                     .build();
             List<Double> embedding = openAiService.createEmbeddings(embeddingRequest)
@@ -87,8 +95,8 @@ public class MercedesController {
                     if (matches.length() > 0) {
                         JSONObject match = matches.getJSONObject(0);
                         JSONObject metadata = match.getJSONObject("metadata");
-                        retrievedText = metadata.getString("text"); // Full text
-                        imagePath = metadata.optString("image", ""); // Optional image path
+                        retrievedText = metadata.getString("text");
+                        imagePath = metadata.optString("image", "");
                     }
                 } else {
                     LOGGER.warning("No matches found in Pinecone response");
@@ -110,7 +118,7 @@ public class MercedesController {
 
             model.addAttribute("text", retrievedText.isEmpty() ? "No match found" : retrievedText);
             model.addAttribute("answer", answer);
-            model.addAttribute("image", imagePath.isEmpty() ? "" : imagePath); // Hidden in result.html
+            model.addAttribute("image", imagePath.isEmpty() ? "" : imagePath);
         } catch (Exception e) {
             LOGGER.severe("Error in query: " + e.getMessage());
             e.printStackTrace();
