@@ -1,12 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mercedes Manual</title>
+    <title>Mercedes-Benz Manual Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .query-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<form method="post" action="/">
-    <input type="text" name="query" placeholder="Ask about the manual...">
-    <button type="submit">Submit</button>
+<h1>Mercedes-Benz Manual Assistant</h1>
+<form method="post" action="/query" class="query-form">
+    <input type="text" name="query" placeholder="Ask about your Mercedes (e.g., 'Tell me about the key fob')">
+    <button type="submit">Ask</button>
 </form>
 </body>
 </html>

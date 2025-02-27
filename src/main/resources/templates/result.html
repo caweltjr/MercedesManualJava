@@ -1,15 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mercedes Manual Result</title>
+    <title>Mercedes-Benz Manual Result</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        h1 { color: #333; text-align: center; }
+        .result-box { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px; }
+        p { margin: 10px 0; line-height: 1.6; }
+        .label { font-weight: bold; color: #555; }
+        a { display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<p>Query: <span th:text="${query}"></span></p>
-<p>Text: <span th:text="${text}"></span></p>
-<p>Answer: <span th:text="${answer}"></span></p>
-<div th:if="${image != null && image != ''}">
-    <img th:src="${image}" alt="Related image"/>
+<h1>Query Result</h1>
+<div class="result-box">
+    <p><span class="label">Your Query:</span> <span th:text="${query}"></span></p>
+    <p><span class="label">Manual Text:</span> <span th:text="${text}"></span></p>
+    <p><span class="label">Answer:</span> <span th:text="${answer}"></span></p>
+    <!-- Images hidden until base URL is resolved -->
+    <!-- <div th:if="${image != ''}">
+        <p><span class="label">Image:</span></p>
+        <img th:src="${image}" alt="Manual Image"/>
+    </div> -->
 </div>
-<a href="/">Back</a>
+<a href="/">Ask Another Question</a>
 </body>
 </html>
