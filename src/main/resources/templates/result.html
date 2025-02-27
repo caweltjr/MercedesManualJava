@@ -10,9 +10,11 @@
         .label { font-weight: bold; color: #555; }
         a { display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; }
         a:hover { text-decoration: underline; }
+        .logo { display: block; margin: 0 auto; max-width: 150px; }
     </style>
 </head>
 <body>
+<img src="/images/logo.png" alt="Mercedes-Benz Logo" class="logo"/>
 <h1>Query Result</h1>
 <div class="result-box">
     <p><span class="label">Your Query:</span> <span th:text="${query}"></span></p>

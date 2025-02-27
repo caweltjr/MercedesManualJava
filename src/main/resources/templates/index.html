@@ -37,9 +37,15 @@
         button:hover {
             background-color: #0056b3;
         }
+        .logo {
+            display: block;
+            margin: 0 auto;
+            max-width: 150px; /* Adjust size as needed */
+        }
     </style>
 </head>
 <body>
+<img src="/images/logo.png" alt="Mercedes-Benz Logo" class="logo"/>
 <h1>Mercedes-Benz Manual Assistant</h1>
 <form method="post" action="/query" class="query-form">
     <input type="text" name="query" placeholder="Ask about your Mercedes (e.g., 'Tell me about the key fob')">
