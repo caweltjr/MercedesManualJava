@@ -5,6 +5,8 @@ import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import okhttp3.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,27 +51,47 @@ public class MercedesController {
                     .build();
             List<Double> embedding = openAiService.createEmbeddings(embeddingRequest)
                     .getData().get(0).getEmbedding();
-            LOGGER.info("OpenAI embedding created");
+            LOGGER.info("OpenAI embedding created: " + embedding.size() + " dimensions, first few: " + embedding.subList(0, Math.min(5, embedding.size())));
 
             // Query Pinecone via REST API
-            String pineconeJson = String.format(
-                    "{\"vector\": %s, \"topK\": 1, \"includeMetadata\": true}",
-                    embedding.toString()
-            );
+            JSONObject payload = new JSONObject();
+            payload.put("vector", embedding);
+            payload.put("topK", 5);
+            payload.put("includeMetadata", true);
+            payload.put("namespace", "");
+            String pineconeJson = payload.toString();
+            LOGGER.info("Pinecone query JSON: " + pineconeJson.substring(0, Math.min(200, pineconeJson.length())) + "...");
+
             RequestBody body = RequestBody.create(pineconeJson, JSON);
             Request pineconeRequest = new Request.Builder()
-                    .url("https://novel-data-gu87d5x.svc.aped-4627-b74a.pinecone.io") // Replace with your Pinecone index URL
+                    .url("https://novel-data-gu87d5x.svc.aped-4627-b74a.pinecone.io/query")
                     .header("Api-Key", System.getenv("PINECONE_API_KEY"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .header("User-Agent", "python-requests/2.28.1")
                     .post(body)
                     .build();
             String retrievedText = "";
             String imagePath = "";
             try (Response response = pineconeClient.newCall(pineconeRequest).execute()) {
+                int responseCode = response.code();
                 String jsonResponse = response.body().string();
-                LOGGER.info("Pinecone response: " + jsonResponse);
+                LOGGER.info("Pinecone response code: " + responseCode);
+                LOGGER.info("Pinecone response body: " + jsonResponse);
+                if (!response.isSuccessful()) {
+                    LOGGER.severe("Pinecone query failed with code: " + responseCode);
+                }
                 if (jsonResponse.contains("\"matches\":[")) {
-                    retrievedText = extractValue(jsonResponse, "\"text\":", ",");
-                    imagePath = extractValue(jsonResponse, "\"image\":", "\"");
+                    JSONObject jsonObj = new JSONObject(jsonResponse);
+                    JSONArray matches = jsonObj.getJSONArray("matches");
+                    if (matches.length() > 0) {
+                        JSONObject match = matches.getJSONObject(0);
+                        JSONObject metadata = match.getJSONObject("metadata");
+                        retrievedText = metadata.getString("text"); // Full text
+                        imagePath = metadata.optString("image", ""); // Optional image path
+                    }
+                } else {
+                    LOGGER.warning("No matches found in Pinecone response");
                 }
             }
 
@@ -88,7 +110,7 @@ public class MercedesController {
 
             model.addAttribute("text", retrievedText.isEmpty() ? "No match found" : retrievedText);
             model.addAttribute("answer", answer);
-            model.addAttribute("image", imagePath.isEmpty() ? "" : imagePath);
+            model.addAttribute("image", imagePath.isEmpty() ? "" : imagePath); // Hidden in result.html
         } catch (Exception e) {
             LOGGER.severe("Error in query: " + e.getMessage());
             e.printStackTrace();
@@ -97,11 +119,5 @@ public class MercedesController {
             model.addAttribute("image", "");
         }
         return "result";
-    }
-
-    private String extractValue(String json, String key, String end) {
-        int start = json.indexOf(key) + key.length() + 1;
-        int finish = json.indexOf(end, start);
-        return start > key.length() && finish > start ? json.substring(start, finish) : "";
     }
 }
