@@ -2,18 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Mercedes-Benz Manual Assistant</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css?v=20250227_5" rel="stylesheet"> <!-- New cache-busting -->
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: #2c3e50; /* Python’s dark metallic gray */
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            background: #ecf0f1; /* Darker metallic gray, Python card match */
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -33,6 +33,7 @@
         }
         .query-form {
             display: flex;
+            flex-direction: column; /* Stacked vertically */
             gap: 15px;
         }
         input[type="text"] {
@@ -41,7 +42,7 @@
             border: 1px solid #7f8c8d;
             border-radius: 8px;
             font-size: 1.1rem;
-            background: #ecf0f1;
+            background: #fff; /* Accepting current white for now */
             transition: border-color 0.3s;
         }
         input[type="text"]:focus {
@@ -51,18 +52,38 @@
         }
         button {
             padding: 12px 25px;
-            background: #f1c40f;
+            background: #f1c40f; /* Yellow, Python match */
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
             font-weight: 500;
             color: #2c3e50;
             transition: background 0.3s;
+            width: 100%; /* Full width in column layout */
+            cursor: pointer; /* Default cursor */
         }
-        button:hover {
+        button:disabled {
+            background: #f1c40f; /* Keep yellow */
+            opacity: 0.7;
+            cursor: wait; /* Busy cursor (spinning) */
+        }
+        button:hover:not(:disabled) {
             background: #f39c12;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.query-form');
+            const button = document.querySelector('button');
+
+            form.addEventListener('submit', function(e) {
+                button.disabled = true; // Disable button, show busy cursor
+                // Re-enable after form submission (handled server-side in Java)
+                // Note: Java needs to return success or trigger re-enable via JavaScript
+                // For now, this works for the click—full loading state needs server feedback
+            });
+        });
+    </script>
 </head>
 <body>
 <div class="container">
